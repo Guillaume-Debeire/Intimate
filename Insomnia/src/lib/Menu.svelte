@@ -1,10 +1,19 @@
 <script>
-import { days, months, years } from '../data/data.js'
+// import { days, months, years } from '../data/data.js'
+import {getDiaries} from '../hooks/getDiaries';
+const {years} = getDiaries();
+console.log("here", years)
+let days = [
+  "01"
+];
+const yearss = ["2020", "2021"];
+
+const months = ["janvier", "février"]
 </script>
 <main>
   <nav class="menu">
     <ul class="drawer years">
-      {#each years as year}
+      {#each yearss as year}
         <li>{year}</li>
       {/each}
     </ul>
