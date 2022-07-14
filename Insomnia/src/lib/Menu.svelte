@@ -1,16 +1,21 @@
 <script>
 import { days, months, years } from '../data/data.js'
+
+let isOpenNav = false;
+const toggleNav = () => {
+  isOpenNav = !isOpenNav
+}
 </script>
 <main>
-  <nav class="menu">
+  <nav class="menu {isOpenNav ? "active": "inactive"}">
     <ul class="drawer years">
       {#each years as year}
-        <li>{year}</li>
+        <li class="year">{year}</li>
       {/each}
     </ul>
     <ul class="drawer months">
       {#each months as month}
-        <li>{month}</li>
+        <li class="month">{month}</li>
       {/each}
     </ul>
     <ul class="drawer days">
@@ -18,6 +23,9 @@ import { days, months, years } from '../data/data.js'
         <li class="day">{day}</li>
       {/each}
     </ul>
+    <button on:click={toggleNav}>
+      bonjour
+    </button>
   </nav>
 </main>
 <style>
@@ -26,7 +34,14 @@ import { days, months, years } from '../data/data.js'
     height: 100vh;
     position: fixed;
     top: 0;
+    transition: all .2s ease-in-out;
+  }
+  .active {
+    left: -450px;
+  }
+  .inactive {
     left: 0;
+
   }
   .drawer {
     width: 150px;
@@ -50,12 +65,12 @@ import { days, months, years } from '../data/data.js'
     color: white;
   }
   .year {
-
+    height: 2rem;
   }
   .month {
-
+    height: 2rem;
   }
   .day {
-    
+    height: 2rem;  
   }
 </style>
