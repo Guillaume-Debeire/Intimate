@@ -52,6 +52,9 @@ const toggleNav = () => {
     margin: 0 auto;
     padding: 0;
   }
+  .drawer:hover {
+    filter: opacity(1);
+  }
   .years {
     background-color: red;
     color: white;
@@ -71,6 +74,10 @@ const toggleNav = () => {
     height: 2rem;
   }
   .day {
-    height: 2rem;  
+    height: 2rem;
+  }
+  .day:hover {
+    background-color: lightgreen;
+    color: black;
   }
 </style>
