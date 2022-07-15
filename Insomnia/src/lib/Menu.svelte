@@ -12,7 +12,20 @@ onMount(async () => {
   data.map((y) => {
     years = [...years, y]
   })
+// console.log(years)
+
 })
+// let selectedMonth = [];
+
+let selectedYear = {}
+let selectedMonths = [];
+const selectYear = (year) => {
+  selectedMonths = [];
+  selectedYear = years.find(y => y.name == year).months.map((month) => {
+    selectedMonths = [...selectedMonths, month]
+  })
+  console.log(selectedMonths)
+}
 
 
 
@@ -29,12 +42,12 @@ const months = ["janvier", "février"]
   <nav class="menu">
     <ul class="drawer years">
         {#each years as year, i}
-          <li class="year">{year.name}</li>
+          <li class="year " on:click={() => selectYear(year.name)}>{year.name}</li>
         {/each}
     </ul>
-    <ul class="drawer months">
-      {#each months as month}
-        <li class="month">{month}</li>
+    <ul class="drawer months {selectedMonths !== [] ? "active" : "inactive"}">
+      {#each selectedMonths as month}
+        <li class="month">{month.name}</li>
       {/each}
     </ul>
     <ul class="drawer days">
@@ -61,13 +74,22 @@ const months = ["janvier", "février"]
     flex-direction: column;
     margin: 0 auto;
     padding: 0;
+    transition: all .2s ease-in-out;
   }
   .years {
     background-color: red;
     color: white;
   }
   .months {
+
     background-color: blue;
+    color: white;
+
+  }
+  .active { 
+    color: black;
+  }
+  .inactive {
     color: white;
   }
   .days {
