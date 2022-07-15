@@ -1,25 +1,40 @@
 <script>
+import { onMount } from 'svelte';
+
 // import { days, months, years } from '../data/data.js'
-import {getDiaries} from '../hooks/getDiaries';
-const {years} = getDiaries();
-console.log("here", years)
+import getDiaries from '../hooks/getDiaries';
+
+let years = [];
+const dataUrl = "http://localhost:3000/years";
+onMount(async () => {
+  const response = await fetch(dataUrl);
+  const data = await response.json();
+  data.map((y) => {
+    years = [...years, y]
+  })
+})
+
+
+
 let days = [
   "01"
 ];
-const yearss = ["2020", "2021"];
 
 const months = ["janvier", "février"]
 </script>
 <main>
+  {#if years === []}
+    Loading...
+  {:else}
   <nav class="menu">
     <ul class="drawer years">
-      {#each yearss as year}
-        <li>{year}</li>
-      {/each}
+        {#each years as year, i}
+          <li class="year">{year.name}</li>
+        {/each}
     </ul>
     <ul class="drawer months">
       {#each months as month}
-        <li>{month}</li>
+        <li class="month">{month}</li>
       {/each}
     </ul>
     <ul class="drawer days">
@@ -28,6 +43,7 @@ const months = ["janvier", "février"]
       {/each}
     </ul>
   </nav>
+  {/if}
 </main>
 <style>
   .menu {
@@ -59,9 +75,10 @@ const months = ["janvier", "février"]
     color: white;
   }
   .year {
-
+    color: white;
   }
   .month {
+    color: white;
 
   }
   .day {
