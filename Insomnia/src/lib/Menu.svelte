@@ -12,19 +12,27 @@ onMount(async () => {
   data.map((y) => {
     years = [...years, y]
   })
-// console.log(years)
+console.log("years", years)
 
 })
-// let selectedMonth = [];
-
 let selectedYear = {}
 let selectedMonths = [];
-const selectYear = (year) => {
+let selectedDays = [];
+
+const selectMonths = (year) => {
   selectedMonths = [];
-  selectedYear = years.find(y => y.name == year).months.map((month) => {
+  selectedDays = []
+  years.find(y => y.name == year).months.map((month) => {
     selectedMonths = [...selectedMonths, month]
   })
   console.log(selectedMonths)
+}
+const selectDays = (month) => {
+  selectedDays = [];
+  selectedMonths.find(m => m.name == month.name).days.map((d) => {
+    selectedDays = [...selectedDays, d]
+  })
+  console.log("days", selectedDays)
 }
 
 
@@ -42,17 +50,17 @@ const months = ["janvier", "février"]
   <nav class="menu">
     <ul class="drawer years">
         {#each years as year, i}
-          <li class="year " on:click={() => selectYear(year.name)}>{year.name}</li>
+          <li class="year " on:click={() => selectMonths(year.name)}>{year.name}</li>
         {/each}
     </ul>
-    <ul class="drawer months {selectedMonths !== [] ? "active" : "inactive"}">
+    <ul class="drawer months {selectedDays === [] ? "inactive" : "active"}">
       {#each selectedMonths as month}
-        <li class="month">{month.name}</li>
+        <li class="month" on:click={() => selectDays(month)}>{month.name}</li>
       {/each}
     </ul>
-    <ul class="drawer days">
-      {#each days as day}
-        <li class="day">{day}</li>
+    <ul class="drawer days {selectedDays === [] ? "inactive" : "active"}">
+      {#each selectedDays as day, i}
+        <li class="day">{`${i < 10 ? "0" : ""}${i}/`}</li>
       {/each}
     </ul>
   </nav>
@@ -91,6 +99,7 @@ const months = ["janvier", "février"]
   }
   .inactive {
     color: white;
+    width: 0px;
   }
   .days {
     background-color: green;
