@@ -5,10 +5,7 @@
 </script>
 
 <main>
-  <img src={logo} alt="Svelte Logo" />
-  <h1>Intime</h1>
   <Menu/>
-  <Content/>
 
 </main>
 
