@@ -1,5 +1,8 @@
 <script>
+// @ts-nocheck
+
 import { onMount } from 'svelte';
+import {clickOutside} from '../hooks/clickOutside';
 
 // Initialisation de variables;
 let years = [];
@@ -11,7 +14,8 @@ let selectedDay = {};
 let isSelectedYear = false;
 let isSelectedMonth = false;
 let isSelectedDay = false;
-let diaryContent = "";
+let diaryTitle = "Bienvenue sur votre Journal Intime.";
+let diaryContent = "Vous pouvez y écrire ce que vous voulez.";
 let isOpenNav = false;
 
 // Charge les années depuis le fichier db.json
@@ -51,37 +55,59 @@ const selectDay = (day) => {
   selectedDay = [];
   const target = selectedDays.find((d, i) => d == day)
   selectedDay = target;
-  diaryContent = Object.values(selectedDay)[0]
+  diaryTitle = selectedDay.title;
+  diaryContent = selectedDay.content;
 }
+
+function handleClickOutside(event) {
+  isOpenNav = false;
+}
+
+// Insertion de contenu dans le db.json
+const handleTitleChange = (event) => {
+  console.log(event.target.value);
+  fetch(dataUrl + "", {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: "POST",
+    body: JSON.stringify({title : event.target.value})
+})
+}
+
 
 </script>
 <main>
   
-  <nav class="menu {isOpenNav ? "open" : "close"}">
+  <nav class="menu {isOpenNav ? "open" : "close"}" use:clickOutside on:click_outside={handleClickOutside}>
     {#if years === []}
       Loading...
     {:else}
-    <ul class="drawer years {isOpenNav ? "open" : "close"}">
-      {#each years as year, i}
+    <ul class="drawer years">
+      {#each years as year}
         <li class="element year" on:click={() => selectMonths(year.name)}>{year.name}</li>
       {/each}
     </ul>
-    <ul class="drawer months {isSelectedYear ? "active" : "inactive"} {isOpenNav ? "open" : "close"}">
+    <ul class="drawer months {isSelectedYear ? "active" : "inactive"}">
       {#each selectedMonths as month}
         <li class="element month" on:click={() => selectDays(month)}>{month.name}</li>
       {/each}
     </ul>
-    <ul class="drawer days {isSelectedMonth ? "active" : "inactive"} {isOpenNav ? "open" : "close"}">
+    <ul class="drawer days {isSelectedMonth ? "active" : "inactive"}">
       {#each selectedDays as day, i}
-        <li class="element day" on:click={() => selectDay(day)}>{`${i < 10 ? "0" : ""}${i}/`}</li>
+        <li class="element day {day.content === "" ? "empty" : ""}" on:click={() => selectDay(day)}>{`${i < 10 ? "0" : ""}${i}/`}</li>
       {/each}
     </ul>
     {/if}
     <button class="menu-button" on:click={() => isOpenNav = !isOpenNav}>
-
+        {isOpenNav ? "<" : ">"}
     </button>
   </nav>
-  <textarea bind:value={diaryContent} class="diary" />
+  <div class="diary {isOpenNav ? "little" : "big"}">
+    <input type="text" bind:value={diaryTitle} class="diary-title" on:input={handleTitleChange}>
+    <textarea bind:value={diaryContent} class="diary-content" />
+  </div>
 </main>
 <style>
 
@@ -92,66 +118,93 @@ const selectDay = (day) => {
     position: fixed;
     top: 0;
     left: 0;
+    width: 450px;
+    transition: width .2s ease-in-out;
   }
   .close {
-    width: 0 !important;
+    width: 0;
   }
   .drawer {
-    width: 150px;
-    filter: opacity(0.8);
+    width: 100%;
     list-style: none;
     display: flex;
     flex-direction: column;
     margin: 0 auto;
-    padding: 0;
+    padding: 2rem 0;
     transition: all .2s ease-in-out;
   }
   .element {
     cursor: pointer;
+    padding: 0.2rem 0;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: all .2s ease-in-out;
+  }
+  .element:hover {
+    background-color: rgb(201, 224, 235);
   }
   .years {
-    background-color: red;
-    color: white;
+    background-color: white;
+    overflow: auto;
   }
   .months {
 
-    background-color: blue;
-    color: white;
+    background-color: white;
+    overflow: auto;
 
   }
   .active { 
     color: black;
   }
   .inactive {
-    color: white;
     width: 0px;
   }
   .days {
-    background-color: green;
-    color: white;
+    background-color: white;
     overflow: auto;
   }
   .year {
-    color: white;
   }
   .month {
-    color: white;
 
   }
   .day {
     
   }
+  .empty {
+    color: rgb(231, 231, 231)  }
 
   /* CONTENU DU JOURNAL **/
   .diary {
-    border: none;
-    background-color: red;
-    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    padding: 4rem;
     height: 60vh;
+    transition: all .2s ease-in-out;
+    margin-right: 5rem;
+  }
+  .big {
+    margin-left: 5rem;
+  }
+  .little {
+    margin-left: 26rem;
+  }
+  .diary-title {
+    font-size: 30px;
+    width: fit-content;
+    margin: auto;
+    border: none;
+    border-bottom: 1px solid lightgrey;
+    padding: 1rem 0;
+  }
+  .diary-content {
+    border: none;
     margin: 5rem auto;
     padding: 1rem 2rem;
+    height: 100%;
+    width: 100%;
   }
-  .diary:active {
-    border: unset;
+  .diary-title:focus {
+
   }
 </style>
