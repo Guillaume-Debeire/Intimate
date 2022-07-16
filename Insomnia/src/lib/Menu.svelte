@@ -109,27 +109,29 @@ const daysUneven = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", 
 const daysFebruary = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"];
 
 // permet d'ajouter une année à la liste
-const addYear = () => {
+const addYear = async () => {
   const yearName = parseInt(lastYear.name) + 1;
   let monthsToFeed = [];
   let daysToFeed = []
   
   const monthModel = months.map((month, ind) => {
+      daysToFeed = [];
     const daysEvenModel = daysEven.map((day, i) => {
-      const p = JSON.stringify({
+      const p = {
         id: i + 1,
-        title: `${i < 9 ? "0" : ""}${i + 1}/${ind}`,
+        title: `${i < 9 ? "0" : ""}${i + 1}/${ind < 9 ? "0" : ""}${ind + 1}/${yearName} `,
         content: ""
-      })
+      };
+      daysToFeed = [...daysToFeed, p]
+      console.log("here", daysToFeed)
     })
-    const j = JSON.stringify({
+    const j = {
       id: ind + 1,
       name: month,
       days: daysToFeed,
-    });
+    };
     monthsToFeed = [...monthsToFeed, j];
   });
-
   const monthBody = monthModel;
   const m = months.map((month, i) => (i + 1));
   const body = JSON.stringify({
@@ -137,16 +139,18 @@ const addYear = () => {
     name: yearName.toString(),
     months : monthsToFeed,
   })
-  console.log(body)
 //   if (prevYear !== null) {
-//     fetch(dataUrl, {
-//     headers: {
-//       'Accept': 'application/json',
-//       'Content-Type': 'application/json'
-//     },
-//     method: "POST",
-//     body: body
-// })
+  await fetch(dataUrl, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: body
+    })
+    // .then(() => {
+    //     years = [...years, body]
+    // })
 //   } 
 
 }
@@ -163,13 +167,15 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
         Loading...
       {:else}
       <ul class="drawer years">
-        <button on:click={() => addYear()} class="year-button">
+        <button  class="year-button">
           +
         </button>
         {#each years as year}
+          {#if year.name !== undefined}
           <li class="element year" on:click={() => selectMonths(year.name)}>{year.name}</li>
-        {/each}
-        <button class="year-button">
+          {/if}
+          {/each}
+        <button on:click={() => addYear()} class="year-button">
           +
         </button>
       </ul>
@@ -285,7 +291,7 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     transform: scale(1.1);
   }
   .empty {
-    color: rgb(231, 231, 231)  
+    color: rgb(188, 188, 188)  
   }
 
   .menu-button {
