@@ -6,6 +6,13 @@ import getDiaries from '../hooks/getDiaries';
 
 let years = [];
 const dataUrl = "http://localhost:3000/years";
+let selectedYear = {}
+let selectedMonths = [];
+let selectedDays = [];
+let selectedDay = {};
+let isSelectedYear = false;
+let isSelectedMonth = false;
+let isSelectedDay = false;
 onMount(async () => {
   const response = await fetch(dataUrl);
   const data = await response.json();
@@ -15,28 +22,36 @@ onMount(async () => {
 console.log("years", years)
 
 })
-let selectedYear = {}
-let selectedMonths = [];
-let selectedDays = [];
 
 const selectMonths = (year) => {
   selectedMonths = [];
-  selectedDays = []
+  selectedDays = [];
   years.find(y => y.name == year).months.map((month) => {
     selectedMonths = [...selectedMonths, month]
   })
-  console.log(selectedMonths)
+    isSelectedYear = true;
+    isSelectedMonth = false;
+  
 }
 const selectDays = (month) => {
   selectedDays = [];
   selectedMonths.find(m => m.name == month.name).days.map((d) => {
     selectedDays = [...selectedDays, d]
   })
-  console.log("days", selectedDays)
+    isSelectedMonth = true;
+  
+}
+const selectDay = (day) => {
+  selectedDay = [];
+    console.log('second', parseInt(Object.keys(day)[0]))
+  const target = selectedDays.find((d, i) => d == day)
+  selectedDay = target;
+  
 }
 
 
 
+console.log("here", selectedDay)
 let days = [
   "01"
 ];
@@ -44,27 +59,35 @@ let days = [
 const months = ["janvier", "février"]
 </script>
 <main>
-  {#if years === []}
+  
+  <nav class="menu">
+    {#if years === []}
     Loading...
   {:else}
-  <nav class="menu">
     <ul class="drawer years">
         {#each years as year, i}
           <li class="year " on:click={() => selectMonths(year.name)}>{year.name}</li>
         {/each}
     </ul>
-    <ul class="drawer months {selectedDays === [] ? "inactive" : "active"}">
+    <ul class="drawer months {isSelectedYear ? "active" : "inactive"}">
       {#each selectedMonths as month}
         <li class="month" on:click={() => selectDays(month)}>{month.name}</li>
       {/each}
     </ul>
-    <ul class="drawer days {selectedDays === [] ? "inactive" : "active"}">
+    <ul class="drawer days {isSelectedMonth ? "active" : "inactive"}">
       {#each selectedDays as day, i}
-        <li class="day">{`${i < 10 ? "0" : ""}${i}/`}</li>
+        <li class="day" on:click={() => selectDay(day)}>{`${i < 10 ? "0" : ""}${i}/`}</li>
       {/each}
     </ul>
+    {/if}
+    <button class="menu-button">
+
+    </button>
   </nav>
-  {/if}
+  <button>
+
+  </button>
+  <textarea class="diary" id="diary" />
 </main>
 <style>
   .menu {
@@ -104,6 +127,7 @@ const months = ["janvier", "février"]
   .days {
     background-color: green;
     color: white;
+    overflow: auto;
   }
   .year {
     color: white;
