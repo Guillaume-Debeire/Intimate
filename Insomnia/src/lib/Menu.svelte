@@ -4,6 +4,10 @@
 import { onMount } from 'svelte';
 import {clickOutside} from '../hooks/clickOutside';
 import placeholders from '../data/placeholders.json';
+import months from '../data/months.json';
+import daysEven from '../data/daysEven.json';
+import daysUneven from '../data/daysUneven.json';
+import daysFebruary from '../data/daysFebruary.json';
 import { element, intros } from 'svelte/internal';
 
 // Initialisation de variables;
@@ -23,7 +27,9 @@ let isOpenNav = false;
 let lastYear = {}
 let mainColor = "rgb(10, 136, 194)";
 let secondaryColor = "rgba(40, 183, 249, 0.562)";
+let lightTheme = "rgb(194, 232, 255)"
 let isOpenColor = false;
+let randomPlaceHolder = "Quoi de neuf ?";
 
 let today = new Date;
 let thisDay = today.getDate() + "/" + (today.getMonth() < 10 ? "0" : "") + (today.getMonth() + 1) +  "/" + today.getFullYear();
@@ -72,6 +78,7 @@ const selectDay = (day) => {
   selectedDay = target;
   diaryTitle = selectedDay.title;
   diaryContent = selectedDay.content;
+  randomPlaceHolder = placeholders[Math.floor((3 * Math.random()))]
 }
 
 function handleClickOutside(event) {
@@ -93,6 +100,7 @@ const handleTitleChange = (event) => {
 // })
   const title = event.target;
   let adjustedWidth = title.clientWidth;
+  console.log(title.style.width);
   adjustedWidth = Math.max(title.style.width, adjustedWidth);
   if (adjustedWidth > title.clientWidth) {
     title.style.width = adjustedWidth + "px";
@@ -107,10 +115,7 @@ const handleContentChange = (event) => {
   }
 }
 
-const months = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-const daysEven = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"];
-const daysUneven = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"];
-const daysFebruary = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"];
+
 
 // permet d'ajouter une année à la liste
 const addYear = async () => {
@@ -143,7 +148,6 @@ const addYear = async () => {
     name: yearName.toString(),
     months : monthsToFeed,
   })
-//   if (prevYear !== null) {
   await fetch(dataUrl, {
         headers: {
           'Accept': 'application/json',
@@ -152,10 +156,6 @@ const addYear = async () => {
         method: "POST",
         body: body
     })
-    // .then(() => {
-    //     years = [...years, body]
-    // })
-//   } 
 
 }
 
@@ -168,9 +168,10 @@ const setColor = (color) => {
 
 console.log("this month", today.getMonth())
 // Génère un placeholder de façon aléatoire
-const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
 </script>
-<main style="--theme-color: {mainColor}">
+
+
+<main style="--theme-color: {mainColor}; --theme-secondary: {secondaryColor}; --theme-light: {lightTheme}">
   
   <nav class="menu {isOpenNav ? "open" : "close"}" use:clickOutside on:click_outside={handleClickOutside}>
     <div class="menu-container">
@@ -215,6 +216,7 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
       class="diary-title"
       on:input={handleTitleChange}
       spellcheck="false"
+      maxlength="54"
     >
     <textarea 
       bind:value={diaryContent} 
@@ -275,28 +277,28 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     list-style: none;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    gap: .2rem;
     margin: 0 auto;
     padding: 0;
     transition: all .2s ease-in-out;
     box-shadow: 2px 2px 15px 0px rgba(0, 0, 0, 0.25);
   }
 
-  .drawer::-webkit-scrollbar {
-    width: 20px;
-  }
+  /* .drawer::-webkit-scrollbar {
+    width: 0px;
+  } */
   .element {
+    /* margin-bottom: 1rem; */
     cursor: pointer;
-    padding: 0.2rem 0;
-    margin: .2rem 1rem;
     background: transparent;
     font-size: 18px;
     border-radius: 5px;
     transition: all .2s ease-in-out;
   }
   .element:hover {
-    background-color: var(--theme-color);
-    color: white;
-    transform: scale(1.1)
+    background-color: rgb(194, 232, 255);
+    /* transform: scale(1.1) */
   }
   .years {
     background-color: white;
@@ -328,7 +330,6 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
   }
   .today {
     color: coral !important;
-    transform: scale(1.1);
   }
   .empty {
     color: rgb(188, 188, 188)  
@@ -376,13 +377,15 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
   }
   .diary-title {
     font-size: 30px;
-    width: fit-content;
+    width: 70%;
+    min-width: 300px;
     margin: auto;
     border: none;
     border-bottom: 1px solid var(--theme-color);
     padding: 1rem 2rem;
     outline: none;
     text-align: center;
+    overflow-x: visible;
   }
   .diary-content {
     border: none;
@@ -392,6 +395,7 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     width: 100%;
     overflow: visible;
     outline: none;
+    font-size: 20px;
     resize: none;
   }
   .diary-content::placeholder {
