@@ -21,9 +21,13 @@ let diaryTitle = "Bienvenue sur votre Journal Intime.";
 let diaryContent = "Vous pouvez y écrire ce que vous voulez.";
 let isOpenNav = false;
 let lastYear = {}
+let mainColor = "rgb(10, 136, 194)";
+let secondaryColor = "rgba(40, 183, 249, 0.562)";
+let isOpenColor = false;
 
 let today = new Date;
 let thisDay = today.getDate() + "/" + (today.getMonth() < 10 ? "0" : "") + (today.getMonth() + 1) +  "/" + today.getFullYear();
+console.log('here', thisDay)
 // Charge les années depuis le fichier db.json
 onMount(async () => {
   const response = await fetch(dataUrl);
@@ -119,7 +123,7 @@ const addYear = async () => {
     const daysEvenModel = daysEven.map((day, i) => {
       const p = {
         id: i + 1,
-        title: `${i < 9 ? "0" : ""}${i + 1}/${ind < 9 ? "0" : ""}${ind + 1}/${yearName} `,
+        title: `${i < 9 ? "0" : ""}${i + 1}/${ind < 9 ? "0" : ""}${ind + 1}/${yearName}`,
         content: ""
       };
       daysToFeed = [...daysToFeed, p]
@@ -155,11 +159,18 @@ const addYear = async () => {
 
 }
 
+// changes the main color of the app 
+const setColor = (color) => {
+  console.log()
+  mainColor = color;
+  isOpenColor = false;
+}
+
 console.log("this month", today.getMonth())
 // Génère un placeholder de façon aléatoire
 const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
 </script>
-<main>
+<main style="--theme-color: {mainColor}">
   
   <nav class="menu {isOpenNav ? "open" : "close"}" use:clickOutside on:click_outside={handleClickOutside}>
     <div class="menu-container">
@@ -198,13 +209,38 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     </div>
   </nav>
   <div class="diary {isOpenNav ? "little" : "big"}">
-    <input type="text" bind:value={diaryTitle} class="diary-title" on:input={handleTitleChange}>
+    <input 
+      type="text"
+      bind:value={diaryTitle}
+      class="diary-title"
+      on:input={handleTitleChange}
+      spellcheck="false"
+    >
     <textarea 
       bind:value={diaryContent} 
       class="diary-content" 
       on:input={handleContentChange}
       placeholder={randomPlaceHolder}
+      spellcheck="false"
     />
+  </div>
+  <div class="color">
+    <div class="color-container">
+      <div class="color-selector base" on:click={() => isOpenColor = !isOpenColor}>
+        
+      </div>
+      <div class="choice-container {isOpenColor ? "down" : "up"}"> 
+        <div class="color-selector choice blue" on:click={() => setColor("rgb(10, 136, 194)")}>
+    
+        </div>
+        <div class="color-selector choice red" on:click={() => setColor("rgb(197, 70, 20)")}>
+    
+        </div>
+        <div class="color-selector choice green" on:click={() => setColor("rgb(61, 161, 15)")}>
+    
+        </div>
+      </div>
+    </div>
   </div>
 </main>
 <style>
@@ -240,9 +276,13 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     display: flex;
     flex-direction: column;
     margin: 0 auto;
-    padding: 2rem 0;
+    padding: 0;
     transition: all .2s ease-in-out;
     box-shadow: 2px 2px 15px 0px rgba(0, 0, 0, 0.25);
+  }
+
+  .drawer::-webkit-scrollbar {
+    width: 20px;
   }
   .element {
     cursor: pointer;
@@ -254,8 +294,8 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     transition: all .2s ease-in-out;
   }
   .element:hover {
-    background: rgba(40, 183, 249, 0.562);
-    /* color: white; */
+    background-color: var(--theme-color);
+    color: white;
     transform: scale(1.1)
   }
   .years {
@@ -287,7 +327,7 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     
   }
   .today {
-    color: coral;
+    color: coral !important;
     transform: scale(1.1);
   }
   .empty {
@@ -296,7 +336,7 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
 
   .menu-button {
     border: none;
-    color: rgb(10, 136, 194);
+    color: var(--theme-color);
     font-size: 40px;
     font-weight: 600;
     background-color: transparent;
@@ -339,7 +379,7 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     width: fit-content;
     margin: auto;
     border: none;
-    border-bottom: 1px solid lightgrey;
+    border-bottom: 1px solid var(--theme-color);
     padding: 1rem 2rem;
     outline: none;
     text-align: center;
@@ -362,8 +402,8 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
   /* Button **/
   .year-button {
     border: none;
-    color: rgb(10, 136, 194);
-    border : 3px solid rgb(10, 136, 194);
+    color: var(--theme-color);
+    border : 3px solid var(--theme-color);
     background-color: transparent;
     cursor: pointer;
     padding: 0.2rem 0;
@@ -375,7 +415,60 @@ const randomPlaceHolder = placeholders[Math.floor((3 * Math.random()) + 1)]
     margin: 2rem auto;
   }
   .year-button:hover {
-    background-color: rgb(10, 136, 194);
+    background-color: var(--theme-color);
     color: white;
+  }
+
+  /* Color Selector **/
+  .color {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+  }
+  .color-container {
+    position: relative;
+  }
+  .color-selector {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0;
+    transition: all .2s ease-in-out;
+    cursor: pointer;
+  }
+  .base {
+    background-color: var(--theme-color);
+  }
+  .choice {
+    margin-bottom: 1rem;
+  }
+  .choice-container {
+    transition: all .2s ease-in-out;
+
+    position: absolute;
+    right: 3rem;
+    top: 0;
+  }
+  .blue {
+    background-color: rgb(10, 136, 194);
+  }
+
+  .red {
+    background-color: rgb(197, 70, 20);
+  }
+
+  .green {
+    background-color: rgb(61, 161, 15);
+  }
+  .color-selector:hover {
+    transform: scale(1.2)
+  }
+
+  .up {
+    transform: translateY(-200%)
+  }
+  .down {
+    transform: translateY(0)
   }
 </style>
